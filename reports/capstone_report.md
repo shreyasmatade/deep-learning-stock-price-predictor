@@ -166,7 +166,7 @@ Calculation:
 
 	We calculate this indictor by subtracting consucutive timestamp and take the day difference.
 
-`def DaySinceLastOpen(df):` 
+`def DaySinceLastOpen(df):`   
     `"""This function assumes that timeseries df indexed by date is passed """`  
     `DSLO = [] ` 
     `DSLO.append(1.0)`      
@@ -178,50 +178,39 @@ Calculation:
 **Since `dslo` is a categorical variable we need to apply one hot encoding on this variable before we use this as a feature. We use one-hot encoding to convert this categorical variable.**
 
 #### Sample Data and Stats
-For IBM ticker  
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/sample_data.PNG "Sample DataSet with derived features")
+Since we have 4 different datasets for each ticker but the basic info about the data would be pretty simillar across these four dataset. So just to get sense of data let's see IBM sample data.  
+
+***IBM - Sample Dataset with derived features***  
+Below image shows the snapshot dataset we made after feature exploration. 
+![Sample Dataset with derived features](https://i.imgur.com/Ghg9Lpo.png)
+				      
 
 
-**Data Info**
-`final_data.info()`
-`<class 'pandas.core.frame.DataFrame'>`
-`DatetimeIndex: 4774 entries, 2000-01-21 to 2019-01-11`
-`Data columns (total 12 columns):`
-`Adj Close    4774 non-null float64`
-`MACD         4774 non-null float64`
-`MOMETM       4774 non-null float64`
-`ATR          4774 non-null float64`
-`dslo_0       4774 non-null float32`
-`dslo_1       4774 non-null float32`
-`dslo_2       4774 non-null float32`
-`dslo_3       4774 non-null float32`
-`dslo_4       4774 non-null float32`
-`dslo_5       4774 non-null float32`
-`dslo_6       4774 non-null float32`
-`dslo_7       4774 non-null float32`
-`dtypes: float32(8), float64(4)`
-`memory usage: 335.7 KB`
+Below image shows datatype and basic information about our dataset.  
+![Dataset info](https://i.imgur.com/3mjrbBC.png)
 
-**Basic Statistics**  
+**Basic Statistics** 
 
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/basic_stats.PNG "Basic Statistics")
-
-
-From Initial analysis, it is very clear that feature 'dslo_6' and 'dslo_0' are not really required in the analysis as its value is 0 for all records.
+From below stats, it is very clear that feature 'dslo_6' and 'dslo_0' are not really required in the analysis as its value is 0 for all records.
 So, we drop these two columns from our final data and save the data in **"[ticker]_processed.csv"** . This is our final prepossessed time series data. This data is further prepared according to model impementation and forecast evaluation's requirement.
 We will discuss **Data Preparation** in later sections.
+ 
 
+![Basic Stats](https://i.imgur.com/2kt8xQR.png)
 
 
 ### Exploratory Visualization
 
 We plot features 'ATR', 'MACD' and 'MOMETM' along with Target variable 'Adj Close'. We avoid functional indicator 'DSLO' since it will be difficult to see its affect on target variable by visualization, we rely on predictive models for that.
 
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/eda_ibm.PNG "IBM feature distribution")
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/eda_aapl.PNG "Apple feature distribution")  
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/eda_msft.PNG "Microsoft feature distribution") 
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/eda_amzn.PNG "Microsoft feature distribution")  
+***For IBM***  
+![](https://i.imgur.com/Onuwo8B.png)
+   
+![](https://i.imgur.com/XxVqqnl.png)  
+ 
+![](https://i.imgur.com/TSD2GJN.png)  
 
+![](https://i.imgur.com/ysG7Z2i.png)
 
 By observing above visualization, we can see there is obvious relation between ATR, MACD and Target variable, Adj Close. When there is movement in target variable there is corresponding fluctuation in ATR and MACD. It will be interesting to see how it helps the model for better prediction.
 MOMETM seems highly fluctuating for all values of target. We will later explore if really need this variable.  
@@ -230,20 +219,16 @@ MOMETM seems highly fluctuating for all values of target. We will later explore 
 
 We have already discussed feature exploration and how we calculated different technical indicators and prepared our dataset. These techniques were in detail discussed above.
 
-**Algorithms**
-
 **Persistance Model Algorithm**    
-As name suggest persistance alorithm is easy and simple, to predict value at timestamp `t` it simple repeats value at timestamp `t-1`. This is a forecasting model where the last observation is persisted forward. Because of its simplicity, it is often called the naive forecast.
-**Used in Project because**  
+As name suggest persistance alorithm is easy and simple, to predict value at timestamp `t` it simple repeats value at timestamp `t-1`. This is a forecasting model where the last observation is persisted forward. Because of its simplicity, it is often called the naive forecast.   
+*Used in Project because*  
 I have Persistence Model as my benchmark model, since it is easy,steady and reliable.
 
 
 **Long Short Temporal Memory Algorithm**   
 The Long Short-Term Memory network, or LSTM network, is a recurrent neural network that is trained using Backpropagation Through Time and overcomes the vanishing gradient problem.
 
-As such, it can be used to create large recurrent networks that in turn can be used to address difficult sequence problems in machine learning and achieve state-of-the-art results.
-
-Instead of neurons, LSTM networks have memory blocks that are connected through layers.
+As such, it can be used to create large recurrent networks that in turn can be used to address difficult sequence problems in machine learning and achieve state-of-the-art results. Instead of neurons, LSTM networks have memory blocks that are connected through layers.
 
 A block has components that make it smarter than a classical neuron and a memory for recent sequences. A block contains gates that manage the block’s state and output. A block operates upon an input sequence and each gate within a block uses the sigmoid activation units to control whether they are triggered or not, making the change of state and addition of information flowing through the block conditional.
 
@@ -253,12 +238,14 @@ There are three types of gates within a unit:
 	Input Gate: conditionally decides which values from the input to update the memory state.
 	Output Gate: conditionally decides what to output based on input and the memory of the block.  
   
-Each unit is like a mini-state machine where the gates of the units have weights that are learned during the training procedure.  
+Each unit is like a mini-state machine where the gates of the units have weights that are learned during the training procedure. 
+
+Since, we are dealing with time series data where each data point has a temporal characteristic attached to it, LSTM network is one of the best model for forecasting temporal data. 
 
 **Used in project because**   
 1. We are forecasting time series data, which is temporal in nature. LSTM network is better fit since it has memory element which is missing in other state-less supervised models and Neural nets.     
 2. Unlike other machine learning algorithms, long short-term memory recurrent neural networks are capable of automatically learning features from sequence data, support multiple-variate data, and can output a variable length sequences that can be used for multi-step forecasting.  
-3 .Multivariate Inputs: LSTMs directly support multiple parallel input sequences for multivariate inputs, unlike other models where multivariate inputs are presented in a flat structure.  
+3. Multivariate Inputs: LSTMs directly support multiple parallel input sequences for multivariate inputs, unlike other models where multivariate inputs are presented in a flat structure.  
 4. Vector Output. Like other neural networks, LSTMs are able to map input data directly to an output vector that may represent multiple output time steps.
  
 
@@ -278,10 +265,10 @@ I have chosen this as my baseline model as it has following three characteristic
 A time series is a sequence of numbers that are ordered by a time index. This can be thought of as a list or column of ordered values. On the other hand, A supervised learning problem is comprised of input patterns (X) and output patterns (y), such that an algorithm can learn how to predict the output patterns from the input patterns.
 So for any time series forecasting problem it is necessary to convert time series data into supervised learning style data where our Target Variable(y), future Adj close price at 't' can be predicted from past value at 't-1', in this case we are using lookback = 1. 
 
-**Function series_to_supervised()**  
+**Converting Time Series Data to Supervised Learning data**  
 We are making use of pandas 'shift()' function to achieve supervised dataset. Default parameters will construct a DataFrame with t-1 as X and t as y.
 
-The function takes four arguments:  
+The function, `SeriesToSupervised` in our analysis takes four arguments:  
 
 
 1. **data:** Sequence of observations as a list or 2D NumPy array. Required.  
@@ -296,7 +283,7 @@ The function returns a single value:
 
 ### Model Prediction
 
-Function named persistence(), that takes the last observation and the number of forecast steps to persist. This function returns an array containing the forecast.
+Function named `persistence`, that takes the last observation and the number of forecast steps to persist. This function returns an array containing the forecast.
 We can then call this function for each time step in the `test` dataset. 
 function make_forecasts() that does this and takes the train, test, and configuration for the dataset as arguments and returns a list of forecasts.
 
@@ -310,59 +297,26 @@ Predictions are also plotted using plot_forecasts() function.
 
 Following results were obtained when we ran persistence model, to predict target variable for next 7 days.
 
-**For IBM**             
-t+1 RMSE: 2.399258
-t+2 RMSE: 2.705824
-t+3 RMSE: 3.096104
-t+4 RMSE: 4.083876
-t+5 RMSE: 4.997928
-t+6 RMSE: 5.853293
-t+7 RMSE: 7.019526
-**Overall RMSE: 4.307973**     
-**For Microsoft**  
-t+1 RMSE: 3.264457
-t+2 RMSE: 3.248963
-t+3 RMSE: 2.899928
-t+4 RMSE: 3.381786
-t+5 RMSE: 3.480314
-t+6 RMSE: 2.418524
-t+7 RMSE: 3.553691
-**Overall RMSE: 3.178238**    
-**For Apple**  
-t+1 RMSE: 7.298900
-t+2 RMSE: 8.191651
-t+3 RMSE: 8.518772
-t+4 RMSE: 8.911374
-t+5 RMSE: 9.241080
-t+6 RMSE: 6.401026
-t+7 RMSE: 5.919230
-**Overall RMSE: 7.783148**   
-**For Amazon**    
-t+1 RMSE: 54.841590
-t+2 RMSE: 64.709003
-t+3 RMSE: 81.138913
-t+4 RMSE: 107.418907
-t+5 RMSE: 135.605513
-t+6 RMSE: 151.213724
-t+7 RMSE: 168.519983
-**Overall RMSE: 109.06394**  
-
-
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/baseline_ibm_result.PNG "IBM feature distribution")
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/baseline_msft_result.PNG "IBM feature distribution")  
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/baseline_aapl_result.PNG "IBM feature distribution")
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/baseline_amzn_result.PNG "IBM feature distribution")
-
+##### BenchMark Results 
+**For IBM 			Overall RMSE: 4.307973**   
+![](https://i.imgur.com/3hHTTO9.png)    
+**For Microsoft 	Overall RMSE: 3.178238**  
+![](https://i.imgur.com/jSeH9PW.png)    
+**For Apple 		Overall RMSE: 7.783148**  
+![](https://i.imgur.com/FgJjGgU.png)   
+**For Amazon 		Overall RMSE: 109.06394**   
+![](https://i.imgur.com/A4hkXSJ.png) 
 
 
 **Above results we have gotten in our benchmark and shall be compared with our other models to decide on final model.**
 
 ## III. Methodology
+To explain the methodology that I followed for various LSTM model, we start from base LSTM model.
 Let's see **Univariate-Multistep-Base-LSTM Model** and go through all the pipeline from data preparation to forecast evaluation. This is basic methodology I followed I improved models on top of this model. Initial Steps, such as Data preparation and evaluation metric are by far the same for all other improved models with minor tweaks. 
 
 ### Data Preparation
 
-This was most challenging step when using LSTM network for time series prediction. Especially, deciding the shape of data for training and then using it to evaluate the forecast was complicated. Fortunalty, explaination provided in Jason Brownlee's blog https://machinelearningmastery.com/how-to-develop-lstm-models-for-multi-step-time-series-forecasting-of-household-power-consumption/ helped.
+This was most challenging step when using LSTM network for time series prediction. Especially, deciding the shape of data for training and then using it to evaluate the forecast was complicated. Fortunalty, explaination provided in [Jason Brownlee's Blog]("https://machinelearningmastery.com/how-to-develop-lstm-models-for-multi-step-time-series-forecasting-of-household-power-consumption/) helped.
 
 #### Splitting Data in Train/Test ####
 
@@ -438,13 +392,14 @@ This multi-step time series forecasting problem is an autoregression. That means
 
 
 ### Refinement
-To improve on forecasting we ran different variants of LSTM such as
+To improve on forecasting we ran different variants of LSTM, 
  
 1. Univariate-Multistep-EncoderDecoder-LSTM
 2. Multivariate-Multistep-EncoderDecoder-LSTM
 3. Univariate-Multistep-CNN-EncoderDecoder-LSTM
 
 Let's see them one by one and see how and what changes we made to our base LSTM model.
+
 ### Univariate Multistep Encoder Decoder LSTM
 
 ### Data Preparation
@@ -583,16 +538,10 @@ In our case, the expected shape of an input pattern is one sample, 7 days of Adj
 [1, 7, 1]
 
 In order to predict the next standard week, we need to retrieve the last days of observations. As with the training data, we must first flatten the history data to remove the weekly structure so that we end up with 10 parallel time series.
-
 Next, we need to retrieve the last seven days of Adj Close Price (feature index 0).
-
 We will parameterize this as we did for the training data so that the number of prior days used as input by the model can be modified in the future.
-
 Next, we reshape the input into the expected three-dimensional structure.
-
 We then make a prediction using the fit model and the input data and retrieve the vector of seven days of output.
-
-The forecast() function below implements this algorithm.
 
 Below are the results we got for different models that we ran,
 
@@ -631,36 +580,50 @@ So,overall it is safe to say **"Univariate-Multistep-CNN-EncoderDecoder-LSTM"** 
 
 ### Free form visualization
 
-**Final Model Prediction vs Actual 
+From our base line model, Persistance model to CNN-Encoder-Decoder-LSTM model, we have seen that Stock market forecasting is really hard problem. By applying various methods, tweaking the hyperparameters does not result in much chages to our metric, RMSE.
+Having said that, the final LSTM model was able to perform better than the benchmark.
 
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/ibm-final-model.PNG "Final Model Prediction for IBM")
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/aapl-final-model.PNG "Final Model Prediction for Apple")   
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/msft-final-model.PNG "Final Model Prediction for Microsoft")
-![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/amzn-final-model.PNG "Final Model Prediction for Amazon")
+####Final Model Prediction vs Actual 
+
+Below images show how our model is forecasting Adjusted Close Price for 4 tickers.
+
+**For IBM**  
+![](https://i.imgur.com/nwyqrSg.png)   
+**For Apple**  
+![](https://i.imgur.com/QpTCiKD.png)  
+**For Microsoft**  
+![](https://i.imgur.com/hhLxWhJ.png)  
+**For Amazon**  
+![](https://i.imgur.com/eiHHbfh.png)
 
 
-**Interseting findings :**
-Multivariate models did not perform as expected, but univariate models are performed better with lesser complexity
+**Interseting findings :**  
+1. There is one stock 'amazon' that gives very high RMSE for each and every model.
+2. Multivariate models did not perform as expected, but univariate models are performed better with lesser complexity.
+3. When tweaking hyperparameters, it was found that lesser complex models were performing better. We used higher batch size, more ecpochs and that actually reduced performance for univariate model that I ran.
 
-**Difficult aspects :**
-Data preprocessing - feature exploration
-Data Preparation for modeling and model evaluation and forecasting 
-Temporal nature of Time Series Analysis 
+**Difficult aspects :**  
+1. In Data prepossessing - feature exploration was one of the challange. After goinf through blogs and reasearch papers I believed in MACD, ATR would be vital in forecasting but I was not able to see the impact of multivariate nature of model.  
+2. Data Preparation for Multivariate LSTM models is tedious task. We have to take care about the shape of the data for training and testing and in model evaluation.  
+3. Data Preparation for modeling and model evaluation and forecasting 
+Temporal nature of Time Series Analysis .  
 
-**Comment on Final Model**
+**Comment on Final Model**  
 Although I would have liked to see major differences between my final model and baseline model, I am satisfied with results. I understand that forecasting multistep time series data for stock market is really difficult and a moving target. So take any improvement over baseline model as win.
 
 This model can be used to make educated guess on the stock prices in future.
 
 ### Improvement
 
-Multivariate analysis with CNN-encoder-decoder LSTM model
-Finding better features
-Make auto trader
------------
+1. Finding better technical indicators is although a challenging task, however I believe that better derrived features can found. This needs more domain expertise which can be achieved with constant reasearch in the area and more experience.
+2. Multivariate analysis with CNN-encoder-decoder LSTM model can be explored to see if that added complexity to model make any difference in our metric.
+3. Re-enforcement learning models such Q-Learning, Deep-Q-learning can be applied.
+4. This project can be extended to build a auto treading bot. Where output of the model can be three signals, Buy, Hold, Sell. 
+5. This further can be extended in Portfolio Management, in order buy and sell stocks depending on future predictions. 
 
+--------------------------------------------------------------------------------------
 
-Links:
+##Links:
 
 1. https://machinelearningmastery.com/how-to-develop-lstm-models-for-multi-step-time-series-forecasting-of-household-power-consumption/
 2. https://machinelearningmastery.com/cnn-long-short-term-memory-networks/
