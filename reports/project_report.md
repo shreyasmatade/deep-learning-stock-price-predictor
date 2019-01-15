@@ -259,7 +259,7 @@ I have chosen this as my baseline model as it has following three characteristic
 **Fast:** A method that is fast to implement and computationally trivial to make a prediction.  
 **Repeatable:** A method that is deterministic, meaning that it produces an expected output given the same input.
 
-### Data Preparation
+#### Data Preparation
 
 **Need for Re-framing Time Series data into Supervised Leanring data**   
 A time series is a sequence of numbers that are ordered by a time index. This can be thought of as a list or column of ordered values. On the other hand, A supervised learning problem is comprised of input patterns (X) and output patterns (y), such that an algorithm can learn how to predict the output patterns from the input patterns.
@@ -281,14 +281,14 @@ The function returns a single value:
 
 1. **return:** Pandas DataFrame of series framed for supervised learning.  
 
-### Model Prediction
+#### Model Prediction
 
 Function named `persistence`, that takes the last observation and the number of forecast steps to persist. This function returns an array containing the forecast.
 We can then call this function for each time step in the `test` dataset. 
 function make_forecasts() that does this and takes the train, test, and configuration for the dataset as arguments and returns a list of forecasts.
 
 
-### Evaluate Forecasts
+#### Evaluate Forecasts
 Finally, we evaluate our forecast
 
 We can do that by calculating the RMSE for each time step of the multi-step forecast. This is done in evaluate_forecasts() function, where we calculate RMSE by means of predicted and actual value.
@@ -297,7 +297,7 @@ Predictions are also plotted using plot_forecasts() function.
 
 Following results were obtained when we ran persistence model, to predict target variable for next 7 days.
 
-##### BenchMark Results 
+#### BenchMark Results 
 **For IBM 			Overall RMSE: 4.307973**   
 ![](https://i.imgur.com/3hHTTO9.png)    
 **For Microsoft 	Overall RMSE: 3.178238**  
@@ -374,7 +374,7 @@ We can also do this in a way where the number of inputs and outputs are paramete
 function named to_supervised() implements discussed technique.
 
 
-### Base LSTM Model Implementation ###
+#### Base LSTM Model Implementation ###
 
 This multi-step time series forecasting problem is an autoregression. That means it is likely best modeled where that the next prediction window (7 days) is some function of observations at prior time steps.
 
@@ -400,12 +400,12 @@ To improve on forecasting we ran different variants of LSTM,
 
 Let's see them one by one and see how and what changes we made to our base LSTM model.
 
-### Univariate Multistep Encoder Decoder LSTM
+#### Univariate Multistep Encoder Decoder LSTM
 
-### Data Preparation
+##### Data Preparation
 Data Preparation steps Spliting Data in Train/Test Split and Converting Time Series to Supervised Learning Data remains the same as in previous model
 
-### Base Encoder Decoder LSTM Model Implementation ###
+##### Base Encoder Decoder LSTM Model Implementation ###
 
 This is slight improvement over base LSTM model, here model will not output a vector sequence directly. Instead, the model will be comprised of two sub models, the encoder to read and encode the input sequence, and the decoder that will read the encoded input sequence and make a one-step prediction for each element in the output sequence.
 The Major difference comes in the decoder, allowing it to both know what was predicted for the prior day in the sequence and accumulate internal state while outputting the sequence.
@@ -432,20 +432,20 @@ Wrap the interpretation layer and the output layer in a TimeDistributed wrapper 
 The network therefore outputs a three-dimensional vector with the same structure as the input, with the dimensions 
 [samples, timesteps, features].
 
-## Multistep Multistep Encoder Decoder LSTM
+#### Multistep Multistep Encoder Decoder LSTM
 
 This model is similar to univariate encoder decoder LSTM. As name 'multivariate' suggests, we will be using all 10 features from our processed dataset to predict the 7 day prediction on Adj Close Price.
 
-### Data Preparation  
+##### Data Preparation  
 
 Data Preparation step Spliting Data in Train/Test Split remains same as in base LSTM model.
 
-#### Converting Time Series to Supervised Learning Data 
+##### Converting Time Series to Supervised Learning Data 
 
 Here we have to provide each one-dimensional time series to the model as a separate sequence of input. Then, The LSTM will in turn create an internal representation of each input sequence that will together be interpreted by the decoder.
 This is achived in to_supervised() function.
 
-### Multivariate Encoder Decoder LSTM Model Implementation ###
+##### Multivariate Encoder Decoder LSTM Model Implementation ###
 
 This is slight improvement over base LSTM model, here model will not output a vector sequence directly. Instead, the model will be comprised of two sub models, the encoder to read and encode the input sequence, and the decoder that will read the encoded input sequence and make a one-step prediction for each element in the output sequence.
 The Major difference comes in the decoder, allowing it to both know what was predicted for the prior day in the sequence and accumulate internal state while outputting the sequence.
@@ -472,14 +472,14 @@ Wrap the interpretation layer and the output layer in a TimeDistributed wrapper 
 The network therefore outputs a three-dimensional vector with the same structure as the input, with the dimensions 
 [samples, timesteps, features].
 
-## Univariate Multistep CNN Encoder Decoder LSTM
+#### Univariate Multistep CNN Encoder Decoder LSTM
 
 This is slight improvement over encoder-decoder model, we are using CNN, convolutional neural net to encoder-decoder architecture.
 
-### Data Preparation
+##### Data Preparation
 Data Preparation steps Spliting Data in Train/Test Split and Converting Time Series to Supervised Learning Data remains the same as in Encoder-decoder LSTM model
 
-### CNN Encoder Decoder LSTM Model Implementation ###
+##### CNN Encoder Decoder LSTM Model Implementation ###
 
 As we know CNN does not directly support sequence input, But a 1D CNN can be handy in the same. They might be usefull in  reading across sequence input and automatically learning the salient features. We apply this CNN-LSTM to our encoder-decoder architecture.
 
@@ -580,10 +580,9 @@ So,overall it is safe to say **"Univariate-Multistep-CNN-EncoderDecoder-LSTM"** 
 
 ### Free form visualization
 
-From our base line model, Persistance model to CNN-Encoder-Decoder-LSTM model, we have seen that Stock market forecasting is really hard problem. By applying various methods, tweaking the hyperparameters does not result in much chages to our metric, RMSE.
-Having said that, the final LSTM model was able to perform better than the benchmark.
+Our final model Univariate-Multistep-CNN-EncoderDecoder-LSTM perform better among all other models we ran.
 
-####Final Model Prediction vs Actual 
+#### Final Model Prediction vs Actual 
 
 Below images show how our model is forecasting Adjusted Close Price for 4 tickers.
 
@@ -595,6 +594,29 @@ Below images show how our model is forecasting Adjusted Close Price for 4 ticker
 ![](https://i.imgur.com/hhLxWhJ.png)  
 **For Amazon**  
 ![](https://i.imgur.com/eiHHbfh.png)
+
+### Reflection
+
+When I started on the this problem, I spent a lot of time on EDA, feature extraction and exploration.
+I wanted to find really good technical indicators which can become vital in forecasting. We saw technical indicators
+like 'ATR', 'MACD' , 'Stochastic Oscillator' representing momentum, fluctuations in time series stock market data.
+
+Then,we started with persistence model, which is naive way of forecasting Adjusted close price at time 't' by 
+repeating Adjusted close price at time 't-1'. Simplistic nature of persistence model sets a good baseline 
+for more sophisticated models.
+We explored LSTM networks to build multistep forecasting models, we found that data preparation for model fitting, model evaluation and forecasting can be challenging.
+We took extra care while splitting data for training and testing to avoid any 'Look Ahead' issues. Overall, we need to mindfull of the shape of the data while working with LSTM Time series forecasting models.
+
+We ran univariate as well as multivariate LSTM models. 
+However, we found that multivariate models are not out performing univariate models and are not worth the complexity they add in the forecasting.
+Univariate-CNN-Encoder-Decoder-LSTM model performed good among all other models with best overall RMSE, metric we used to compare results.   
+
+From our base line model, Persistance model to CNN-Encoder-Decoder-LSTM model, 
+we have seen that Stock market forecasting is really hard problem. By applying 
+various methods, tweaking the hyperparameters does not result in much chages to 
+our metric, RMSE. 
+Having said that, the final LSTM model was able to perform better than the benchmark.
+
 
 
 **Interseting findings :**  
