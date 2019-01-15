@@ -11771,6 +11771,94 @@ div#notebook {
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container" id="notebook-container">
 
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Univariate-Multistep-Base-LSTM">Univariate Multistep Base LSTM<a class="anchor-link" href="#Univariate-Multistep-Base-LSTM">&#182;</a></h2><h3 id="Data-Preparation">Data Preparation<a class="anchor-link" href="#Data-Preparation">&#182;</a></h3><p>This was most challanging step when using LSTM network for time series prediction. Especially, deciding the shape of data for training and then using it to evaluate the forecast was complicated. Fortunalty, explaination provided in Jason Brownlee's blog <a href="https://machinelearningmastery.com/how-to-develop-lstm-models-for-multi-step-time-series-forecasting-of-household-power-consumption/">https://machinelearningmastery.com/how-to-develop-lstm-models-for-multi-step-time-series-forecasting-of-household-power-consumption/</a> helped.</p>
+<h4 id="Spliting-Data-in-Train/Test">Spliting Data in Train/Test<a class="anchor-link" href="#Spliting-Data-in-Train/Test">&#182;</a></h4><p>As explained in Data Preprocessing section, we are using time series data of stock market which is logged on daily basis.
+We are using data from year 2000 to current date. So, that gives us around <strong>4700 records for single ticker dataset</strong>.
+I have decided to split data in <strong>70/30 ~ Train/Test</strong> percent, i.e. Training Data on 70% records of total records and test on remaing 30%
+However, since it is a time series data we cannot split randomly. so we train on initial 70% of data and we test on later 30% data, preserving temporal nature of the data.</p>
+<p>Since we are predicting 7 days in future, it make sence to group data in 7 open market days. These days are not necessary any specific day of the week we are just interested in grouping records in chunks of 7 days so that it will be easer more modeling and forcasting.</p>
+<p>In order to achieve that we need records divisible by 7, so we get latest number of records divisible by 7. Then we move forward to split data for train and test</p>
+<p>Train Data : This is obtained by starting from beginning of the data to the record which is divisible by 7 and nearest to 70% of the total data
+Test Data  : This is obtained by getting last number of records which are divisible by 7 and nearest to 30% percent.</p>
+<p>This is all implemented in split_dataset() function.</p>
+<p><strong>For Example:</strong>
+ Suppose we have dataset, in shape, (4777,10)<br>
+ Total Data : 4777 / 7 = 682.4 ==&gt; 7<em> 682 ==&gt; 4774, we take latest 4774 records, now shape is (4774,10)<br>
+ Train Data : 4774 </em> 70 / 100 ==&gt;3341 / 7==&gt;477.28 ==&gt; 477 * 7 ==&gt; 3339, so we take 0 to 3339 records for training,(3339,10)<br>
+ Test Data  : 4774-3339 ==&gt; 1435 , so we take last 1435 records for testing, (1435,10)</p>
+<p>And we group records by 7 open days so ,
+<strong>Train Data shape (477,7,10) and Test data shape becomes (205,7,10) </strong></p>
+<h4 id="Converting-Time-Series-to-Supervised-Learning-Data">Converting Time Series to Supervised Learning Data<a class="anchor-link" href="#Converting-Time-Series-to-Supervised-Learning-Data">&#182;</a></h4><p>As per LSTM model requirement to have data in the shape:
+[samples, timesteps, features]</p>
+<p>Our split_dataset() function will provide us data in that shape.</p>
+<p>In order to create a lot more training data, we are to change the problem during training to predict the next seven days given the prior seven days, regardless of the standard week.</p>
+<p>This only impacts the training data, and the test problem remains the same: predict the daily power consumption for the next standard week given the prior standard week.</p>
+<p>This will require a little preparation of the training data.</p>
+<p>The training data is provided in 7 day window with 10 features, specifically in the shape [477, 7, 10]. The first step is to flatten the data so that we have 10 time series sequences.</p>
+<p>We then need to iterate over the time steps and divide the data into overlapping windows; each iteration moves along one time step and predicts the subsequent next window of 7 days.</p>
+<p>For example:<br>
+                 Input, Output<br>
+                 [d01, d02, d03, d04, d05, d06, d07], [d08, d09, d10, d11, d12, d13, d14]<br>
+                 [d02, d03, d04, d05, d06, d07, d08], [d09, d10, d11, d12, d13, d14, d15]<br>
+and so on...</p>
+<p>We can do this by keeping track of start and end indexes for the inputs and outputs as we iterate across the length of the flattened data in terms of time steps.</p>
+<p>We can also do this in a way where the number of inputs and outputs are parameterized (e.g. n_input, n_out) so that you can experiment with different values or adapt it for your own problem.</p>
+<p>function named to_supervised() implements discussed technique.</p>
+<h3 id="Base-LSTM-Model-Implementation">Base LSTM Model Implementation<a class="anchor-link" href="#Base-LSTM-Model-Implementation">&#182;</a></h3><p>This multi-step time series forecasting problem is an autoregression. That means it is likely best modeled where that the next prediction window (7 days) is some function of observations at prior time steps.</p>
+<p><strong>LSTM Network :</strong></p>
+
+<pre><code>1. Hidden LSTM layer            : Single layer with 200 units. The number of units in the hidden layer is unrelated to the                                        number of time steps in the input sequences. 
+2. Fully connected Dense layer  : 200 nodes that will interpret the features learned by the LSTM layer. 
+3. Output layer                 : This will directly predict a vector with seven elements
+
+</code></pre>
+<p><strong>Hyper Parameters :</strong></p>
+
+<pre><code>1. Loss function                : Mean Square Error (MSE), as it goes well with our metric RMSE 
+2. Optimiser                    : adam, stochastic gradient descent make sense
+3. Epochs                       : 70
+4. Batch size                   : 16
+
+</code></pre>
+<p>The build_model() below prepares the training data, defines the model, and fits the model on the training data, returning the fit model ready for making predictions.</p>
+<h3 id="Model-Evaluation">Model Evaluation<a class="anchor-link" href="#Model-Evaluation">&#182;</a></h3><p>Models is be evaluated using a scheme called walk-forward validation.</p>
+<p>This is where a model is required to make prediction for fixed window, here as we grouped data in 7 days that is our window. then the actual data for that window is made available to the model so that it can be used as the basis for making a prediction on the next window. This is both realistic for how the model may be used in practice and beneficial to the models allowing them to make use of the best available data.</p>
+<p>We can demonstrate this below with separation of input data and output/predicted data.</p>
+
+<pre><code>**Input,**                           **Predict**  
+[Window1]                     ===&gt;   [Window2]  
+[Window1 + Window2]          ===&gt;    [Window3]  
+[Window1 + Window2 + Window3] ===&gt;   [Window4]  
+</code></pre>
+<p>and so on...</p>
+<p>The walk-forward validation approach to evaluating predictive models on this dataset is provided below named evaluate_model().</p>
+<p>The train and test datasets in windowed format are provided to the function as arguments. An additional argument n_input is provided that is used to define the number of prior observations that the model will use as input in order to make a prediction.</p>
+<p>We are working with neural networks, and as such, they are generally slow to train but fast to evaluate. This means that the preferred usage of the models is to build them once on historical data and to use them to forecast each step of the walk-forward validation.</p>
+<h3 id="Model-Forecasting">Model Forecasting<a class="anchor-link" href="#Model-Forecasting">&#182;</a></h3><p>In our case, the expected shape of an input pattern is one sample, 7 days of Adj Close Price:
+[1, 7, 1]</p>
+<p>In order to predict the next standard week, we need to retrieve the last days of observations. As with the training data, we must first flatten the history data to remove the weekly structure so that we end up with 10 parallel time series.</p>
+<p>Next, we need to retrieve the last seven days of Adj Close Price (feature index 0).</p>
+<p>We will parameterize this as we did for the training data so that the number of prior days used as input by the model can be modified in the future.</p>
+<p>Next, we reshape the input into the expected three-dimensional structure.</p>
+<p>We then make a prediction using the fit model and the input data and retrieve the vector of seven days of output.</p>
+<p>The forecast() function below implements this algorithm.</p>
+<h3 id="Evaluation-Metric">Evaluation Metric<a class="anchor-link" href="#Evaluation-Metric">&#182;</a></h3><p>Our forecast will be comprised of seven values, since we are predicting for 7 days in future. It is common with multi-step forecasting problems to evaluate each forecasted time step separately.
+This is helpful for a few reasons:</p>
+<ol>
+<li>To comment on the skill at a specific lead time (e.g. +1 day vs +3 days).   </li>
+<li>To contrast models based on their skills at different lead times (e.g. models good at +1 day vs models good at days +5).   </li>
+</ol>
+<p>Since our target variable is in USD, our forecasted value should be in USD as well Mean Absolute Error (MSE) and Root Mean Square Error (RMSE) both are applicable here as metric. I choose RMSE since it is more punishing of forecast errors.<br>
+The performance metric for this problem will be the RMSE for each lead time from day 1 to day 7.</p>
+<p>The function evaluate_forecasts() is implemented to calculate RMSE and return the performance of a model based on multiple seven-day forecasts.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
@@ -11825,15 +11913,15 @@ div#notebook {
 
 <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Saves data to csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">)</span>
     
 <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load data from csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span><span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span><span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
     
 <span class="k">def</span> <span class="nf">data_exists</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check if file exists in data&quot;&quot;&quot;</span>
-    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
+    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">my_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">res</span>
     
@@ -12842,21 +12930,17 @@ height=275
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">IBM</span>      <span class="p">:</span> <span class="n">lstm</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.175</span><span class="p">]</span> <span class="mf">1.6</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.9</span><span class="p">,</span> <span class="mf">4.4</span>
-<span class="n">Apple</span>    <span class="p">:</span> <span class="n">lstm</span><span class="p">:</span> <span class="p">[</span><span class="mf">15.809</span><span class="p">]</span> <span class="mf">15.1</span><span class="p">,</span> <span class="mf">15.8</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">,</span> <span class="mf">16.9</span><span class="p">,</span> <span class="mf">15.2</span><span class="p">,</span> <span class="mf">16.5</span>
-<span class="n">Amazon</span>   <span class="p">:</span> <span class="n">lstm</span><span class="p">:</span> <span class="p">[</span><span class="mf">35.133</span><span class="p">]</span> <span class="mf">17.6</span><span class="p">,</span> <span class="mf">25.3</span><span class="p">,</span> <span class="mf">27.6</span><span class="p">,</span> <span class="mf">32.5</span><span class="p">,</span> <span class="mf">34.9</span><span class="p">,</span> <span class="mf">45.6</span><span class="p">,</span> <span class="mf">50.7</span>
-<span class="n">Microsoft</span><span class="p">:</span> <span class="n">lstm</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.292</span><span class="p">]</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">4.6</span>
-</pre></div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>IBM      : lstm: [3.175] 1.6, 2.1, 2.7, 3.1, 3.5, 3.9, 4.4
+Apple    : lstm: [15.809] 15.1, 15.8, 15.0, 16.0, 16.9, 15.2, 16.5
+Amazon   : lstm: [35.133] 17.6, 25.3, 27.6, 32.5, 34.9, 45.6, 50.7
+Microsoft: lstm: [3.292] 2.2, 2.4, 2.6, 3.1, 3.4, 4.0, 4.6</p>
 
 </div>
 </div>
-</div>
-
 </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>DataPreparation</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>DataPreprocessing</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11775,7 +11775,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Data-Preparation">Data Preparation<a class="anchor-link" href="#Data-Preparation">&#182;</a></h2><h3 id="Datasets">Datasets<a class="anchor-link" href="#Datasets">&#182;</a></h3><p>I will be using <a href="https://pypi.org/project/fix-yahoo-finance/">fix-yahoo-finance</a> python package to get the stock data. Below are the variables of the time series data of a single stock.<br>
+<h2 id="Data-Preprocessing">Data Preprocessing<a class="anchor-link" href="#Data-Preprocessing">&#182;</a></h2><h3 id="Datasets">Datasets<a class="anchor-link" href="#Datasets">&#182;</a></h3><p>I will be using <a href="https://pypi.org/project/fix-yahoo-finance/">fix-yahoo-finance</a> python package to get the stock data. Below are the variables of the time series data of a single stock.<br>
 Solution shall be able to get the historical data given a Ticker symbol of the desired stock. 
 I will be using data for following tickers from <code>START_DATE = '2000-01-01'</code> till current date.</p>
 <ol>
@@ -11804,7 +11804,7 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import ML libs</span>
@@ -11848,24 +11848,6 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Using TensorFlow backend.
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -11878,7 +11860,7 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_date</span><span class="p">():</span>
@@ -11888,15 +11870,15 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 
 <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">fileName</span><span class="p">,</span><span class="n">saveIndex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Saves data to csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">saveIndex</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">saveIndex</span><span class="p">)</span>
     
 <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load data from csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
     
 <span class="k">def</span> <span class="nf">data_exists</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check if file exists in data&quot;&quot;&quot;</span>
-    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
+    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">my_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">res</span>
     
@@ -11939,7 +11921,7 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">fill_missing_values</span><span class="p">(</span><span class="n">df_data</span><span class="p">):</span>
@@ -11998,7 +11980,7 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">MACD</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">period1</span><span class="p">,</span><span class="n">period2</span><span class="p">,</span><span class="n">periodSignal</span><span class="p">):</span>
@@ -12046,11 +12028,11 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[43]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">tickers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;IBM&quot;</span><span class="p">,</span><span class="s2">&quot;AAPL&quot;</span><span class="p">,</span><span class="s2">&quot;MSFT&quot;</span><span class="p">,</span><span class="s2">&quot;AMZN&quot;</span><span class="p">]</span>
-<span class="n">use_ticker</span> <span class="o">=</span> <span class="n">tickers</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">use_ticker</span> <span class="o">=</span> <span class="n">tickers</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">use_ticker</span><span class="p">)</span>
 
 <span class="c1"># Impute</span>
@@ -12076,13 +12058,13 @@ ALLOWED_DELTA = datetime.timedelta(days=7)</code></p>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>[*********************100%***********************]  1 of 1 downloaded
-                Open      High       Low     Close  Adj Close     Volume
-Date                                                                    
-2000-01-03  3.745536  4.017857  3.631696  3.997768   2.677157  133949200
-2000-01-04  3.866071  3.950893  3.613839  3.660714   2.451444  128094400
-2000-01-05  3.705357  3.948661  3.678571  3.714286   2.487319  194580400
-2000-01-06  3.790179  3.821429  3.392857  3.392857   2.272070  191993200
-2000-01-07  3.446429  3.607143  3.410714  3.553571   2.379695  115183600
+               Open     High        Low    Close  Adj Close    Volume
+Date                                                                 
+2000-01-03  81.5000  89.5625  79.046799  89.3750    89.3750  16117600
+2000-01-04  85.3750  91.5000  81.750000  81.9375    81.9375  17487400
+2000-01-05  70.5000  75.1250  68.000000  69.7500    69.7500  38457400
+2000-01-06  71.3125  72.6875  64.000000  65.5625    65.5625  18752000
+2000-01-07  67.0000  70.5000  66.187500  69.5625    69.5625  10505400
 </pre>
 </div>
 </div>
@@ -12101,7 +12083,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[44]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">macd</span> <span class="o">=</span> <span class="n">MACD</span><span class="p">(</span><span class="n">dfPrices</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
@@ -12115,7 +12097,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[45]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">stochastics</span> <span class="o">=</span> <span class="n">stochastics_oscillator</span><span class="p">(</span><span class="n">dfPrices</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
@@ -12129,7 +12111,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[46]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">atr</span> <span class="o">=</span> <span class="n">ATR</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="mi">14</span><span class="p">)</span>
@@ -12153,7 +12135,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[47]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get categorical dslo</span>
@@ -12181,7 +12163,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[48]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">final_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dfPrices</span><span class="p">,</span><span class="n">macd</span><span class="p">,</span><span class="n">stochastics</span><span class="p">,</span><span class="n">atr</span><span class="p">,</span><span class="n">encoded_dslo</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -12196,7 +12178,7 @@ Date
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[49]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">final_data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
@@ -12217,20 +12199,20 @@ Date
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
-DatetimeIndex: 4774 entries, 2000-01-21 to 2019-01-11
+DatetimeIndex: 4775 entries, 2000-01-21 to 2019-01-14
 Data columns (total 12 columns):
-Adj Close    4774 non-null float64
-MACD         4774 non-null float64
-MOMETM       4774 non-null float64
-ATR          4774 non-null float64
-dslo_0       4774 non-null float32
-dslo_1       4774 non-null float32
-dslo_2       4774 non-null float32
-dslo_3       4774 non-null float32
-dslo_4       4774 non-null float32
-dslo_5       4774 non-null float32
-dslo_6       4774 non-null float32
-dslo_7       4774 non-null float32
+Adj Close    4775 non-null float64
+MACD         4775 non-null float64
+MOMETM       4775 non-null float64
+ATR          4775 non-null float64
+dslo_0       4775 non-null float32
+dslo_1       4775 non-null float32
+dslo_2       4775 non-null float32
+dslo_3       4775 non-null float32
+dslo_4       4775 non-null float32
+dslo_5       4775 non-null float32
+dslo_6       4775 non-null float32
+dslo_7       4775 non-null float32
 dtypes: float32(8), float64(4)
 memory usage: 335.7 KB
 </pre>
@@ -12243,7 +12225,7 @@ memory usage: 335.7 KB
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[50]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">final_data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
@@ -12259,7 +12241,7 @@ memory usage: 335.7 KB
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[16]:</div>
+<div class="prompt output_prompt">Out[50]:</div>
 
 
 
@@ -12314,10 +12296,10 @@ memory usage: 335.7 KB
   <tbody>
     <tr>
       <th>2000-01-21</th>
-      <td>2.662209</td>
-      <td>0.035119</td>
-      <td>91.686530</td>
-      <td>0.145089</td>
+      <td>62.0625</td>
+      <td>-0.247378</td>
+      <td>0.000000</td>
+      <td>4.7500</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12329,10 +12311,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-24</th>
-      <td>2.541132</td>
-      <td>0.030618</td>
-      <td>72.446703</td>
-      <td>0.272322</td>
+      <td>70.1250</td>
+      <td>0.124545</td>
+      <td>40.566038</td>
+      <td>11.3125</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -12344,10 +12326,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-25</th>
-      <td>2.684630</td>
-      <td>0.034074</td>
-      <td>95.249355</td>
-      <td>0.383929</td>
+      <td>69.2500</td>
+      <td>0.332524</td>
+      <td>89.147287</td>
+      <td>5.2500</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12359,10 +12341,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-26</th>
-      <td>2.635303</td>
-      <td>0.032370</td>
-      <td>87.411013</td>
-      <td>0.158482</td>
+      <td>64.8125</td>
+      <td>0.229188</td>
+      <td>34.108527</td>
+      <td>5.2500</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12374,10 +12356,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-27</th>
-      <td>2.630817</td>
-      <td>0.029670</td>
-      <td>86.698162</td>
-      <td>0.214285</td>
+      <td>66.9375</td>
+      <td>0.279880</td>
+      <td>60.465116</td>
+      <td>3.1250</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12389,10 +12371,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-28</th>
-      <td>2.430518</td>
-      <td>0.015247</td>
-      <td>54.869507</td>
-      <td>0.366071</td>
+      <td>61.6875</td>
+      <td>0.016640</td>
+      <td>0.000000</td>
+      <td>6.9375</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12404,10 +12386,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-01-31</th>
-      <td>2.481340</td>
-      <td>0.007609</td>
-      <td>62.945413</td>
-      <td>0.334821</td>
+      <td>64.5625</td>
+      <td>0.012401</td>
+      <td>34.074074</td>
+      <td>6.3125</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -12419,10 +12401,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-02-01</th>
-      <td>2.397632</td>
-      <td>-0.003005</td>
-      <td>49.643733</td>
-      <td>0.178571</td>
+      <td>67.4375</td>
+      <td>0.187916</td>
+      <td>68.148148</td>
+      <td>6.2500</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12434,10 +12416,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-02-02</th>
-      <td>2.363252</td>
-      <td>-0.012446</td>
-      <td>12.313468</td>
-      <td>0.183035</td>
+      <td>69.4375</td>
+      <td>0.431235</td>
+      <td>91.851852</td>
+      <td>4.8125</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12449,10 +12431,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>2000-02-03</th>
-      <td>2.470876</td>
-      <td>-0.012203</td>
-      <td>30.638191</td>
-      <td>0.194196</td>
+      <td>84.1875</td>
+      <td>1.485749</td>
+      <td>100.000000</td>
+      <td>16.5000</td>
       <td>0.0</td>
       <td>1.0</td>
       <td>0.0</td>
@@ -12475,7 +12457,7 @@ memory usage: 335.7 KB
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[51]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">final_data</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
@@ -12491,7 +12473,7 @@ memory usage: 335.7 KB
 
 <div class="output_area">
 
-<div class="prompt output_prompt">Out[17]:</div>
+<div class="prompt output_prompt">Out[51]:</div>
 
 
 
@@ -12531,55 +12513,55 @@ memory usage: 335.7 KB
   <tbody>
     <tr>
       <th>count</th>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.0</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.000000</td>
-      <td>4774.0</td>
-      <td>4774.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.0</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.000000</td>
+      <td>4775.0</td>
+      <td>4775.000000</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>45.514683</td>
-      <td>-0.015970</td>
-      <td>58.120048</td>
-      <td>1.125256</td>
+      <td>288.805468</td>
+      <td>-0.038066</td>
+      <td>55.570543</td>
+      <td>7.497574</td>
       <td>0.0</td>
-      <td>0.782782</td>
-      <td>0.009845</td>
-      <td>0.181190</td>
-      <td>0.025555</td>
+      <td>0.782618</td>
+      <td>0.009843</td>
+      <td>0.181361</td>
+      <td>0.025550</td>
       <td>0.000419</td>
       <td>0.0</td>
       <td>0.000209</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>55.174150</td>
-      <td>0.604943</td>
-      <td>36.825707</td>
-      <td>1.435248</td>
+      <td>414.544755</td>
+      <td>4.603911</td>
+      <td>36.926956</td>
+      <td>13.346907</td>
       <td>0.0</td>
-      <td>0.412390</td>
-      <td>0.098742</td>
-      <td>0.385223</td>
-      <td>0.157824</td>
-      <td>0.020465</td>
+      <td>0.412499</td>
+      <td>0.098731</td>
+      <td>0.385362</td>
+      <td>0.157808</td>
+      <td>0.020463</td>
       <td>0.0</td>
-      <td>0.014474</td>
+      <td>0.014472</td>
     </tr>
     <tr>
       <th>min</th>
-      <td>0.627570</td>
-      <td>-4.903227</td>
+      <td>5.970000</td>
+      <td>-41.803910</td>
       <td>0.000000</td>
-      <td>0.013571</td>
+      <td>0.220000</td>
       <td>0.0</td>
       <td>0.000000</td>
       <td>0.000000</td>
@@ -12591,10 +12573,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>25%</th>
-      <td>2.989566</td>
-      <td>-0.107592</td>
-      <td>22.756815</td>
-      <td>0.165714</td>
+      <td>39.480002</td>
+      <td>-0.894097</td>
+      <td>19.420806</td>
+      <td>1.390003</td>
       <td>0.0</td>
       <td>1.000000</td>
       <td>0.000000</td>
@@ -12606,10 +12588,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>50%</th>
-      <td>17.662357</td>
-      <td>0.002236</td>
-      <td>65.717552</td>
-      <td>0.692143</td>
+      <td>90.000000</td>
+      <td>0.032220</td>
+      <td>60.924109</td>
+      <td>3.640000</td>
       <td>0.0</td>
       <td>1.000000</td>
       <td>0.000000</td>
@@ -12621,10 +12603,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>75%</th>
-      <td>69.123907</td>
-      <td>0.114137</td>
-      <td>95.694468</td>
-      <td>1.521427</td>
+      <td>323.654999</td>
+      <td>0.869217</td>
+      <td>92.537774</td>
+      <td>7.585007</td>
       <td>0.0</td>
       <td>1.000000</td>
       <td>0.000000</td>
@@ -12636,10 +12618,10 @@ memory usage: 335.7 KB
     </tr>
     <tr>
       <th>max</th>
-      <td>231.263092</td>
-      <td>3.484961</td>
+      <td>2039.510010</td>
+      <td>34.860972</td>
       <td>100.000000</td>
-      <td>16.800003</td>
+      <td>179.170044</td>
       <td>0.0</td>
       <td>1.000000</td>
       <td>1.000000</td>
@@ -12662,7 +12644,7 @@ memory usage: 335.7 KB
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[52]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">save_data</span><span class="p">(</span><span class="n">final_data</span><span class="p">,</span><span class="n">use_ticker</span><span class="o">+</span><span class="s2">&quot;_final&quot;</span><span class="p">)</span>

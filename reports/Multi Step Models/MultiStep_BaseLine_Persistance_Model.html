@@ -11783,8 +11783,31 @@ I have chosen this as my baseline model as it has following three characteristic
 <strong>Fast:</strong> A method that is fast to implement and computationally trivial to make a prediction.<br>
 <strong>Repeatable:</strong> A method that is deterministic, meaning that it produces an expected output given the same input.</p>
 <p><strong>Persistance Model Algorithm</strong><br>
-As name suggest persistance alorithm is easy and simple, to predict value at timestamp <code>t</code> it simple repeats value at timestamp <code>t-1</code>.</p>
+As name suggest persistance alorithm is easy and simple, to predict value at timestamp <code>t</code> it simple repeats value at timestamp <code>t-1</code>. This is a forecasting model where the last observation is persisted forward. Because of its simplicity, it is often called the naive forecast.</p>
 <p><code>link</code><a href="https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/">https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/</a></p>
+<h3 id="Data-Preparation">Data Preparation<a class="anchor-link" href="#Data-Preparation">&#182;</a></h3><p><strong>Need for Re-framing Time Series data into Supervised Leanring data</strong><br>
+A time series is a sequence of numbers that are ordered by a time index. This can be thought of as a list or column of ordered values. On the other hand, A supervised learning problem is comprised of input patterns (X) and output patterns (y), such that an algorithm can learn how to predict the output patterns from the input patterns.
+So for any time series forecasting problem it is necessary to convert time series data into supervised learning style data where our Target Variable(y), future Adj close price at 't' can be predicted from past value at 't-1', in this case we are using lookback = 1.</p>
+<p><strong>Function series_to_supervised()</strong><br>
+We are making use of pandas 'shift()' function to achieve supervised dataset. Default parameters will construct a DataFrame with t-1 as X and t as y.</p>
+<p>The function takes four arguments:</p>
+<ol>
+<li><strong>data:</strong> Sequence of observations as a list or 2D NumPy array. Required.  </li>
+<li><strong>n_in:</strong> Number of lag observations as input (X). Values may be between [1..len(data)] Optional. Defaults to 1.  </li>
+<li><strong>n_out:</strong> Number of observations as output (y). Values may be between [0..len(data)-1]. Optional. Defaults to 1.  </li>
+<li><strong>dropnan:</strong> Boolean whether or not to drop rows with NaN values. Optional. Defaults to True.  </li>
+</ol>
+<p>The function returns a single value:</p>
+<ol>
+<li><strong>return:</strong> Pandas DataFrame of series framed for supervised learning.  </li>
+</ol>
+<p><a href="https://machinelearningmastery.com/convert-time-series-supervised-learning-problem-python/">https://machinelearningmastery.com/convert-time-series-supervised-learning-problem-python/</a></p>
+<h3 id="Model-Prediction">Model Prediction<a class="anchor-link" href="#Model-Prediction">&#182;</a></h3><p>Function named persistence(), that takes the last observation and the number of forecast steps to persist. This function returns an array containing the forecast.
+We can then call this function for each time step in the <code>test</code> dataset. 
+function make_forecasts() that does this and takes the train, test, and configuration for the dataset as arguments and returns a list of forecasts.</p>
+<h3 id="Evaluate-Forecasts">Evaluate Forecasts<a class="anchor-link" href="#Evaluate-Forecasts">&#182;</a></h3><p>Finally, we evaluate our forecast</p>
+<p>We can do that by calculating the RMSE for each time step of the multi-step forecast. This is done in evaluate_forecasts() function, where we calculate RMSE by means of predicted and actual value.
+Predictions are also plotted using plot_forecasts() function.</p>
 
 </div>
 </div>
@@ -11842,15 +11865,15 @@ As name suggest persistance alorithm is easy and simple, to predict value at tim
 
 <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Saves data to csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">)</span>
     
 <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load data from csv file, file name is Ticker symbol &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span><span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span><span class="p">,</span><span class="n">infer_datetime_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">],</span> <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">])</span>
     
 <span class="k">def</span> <span class="nf">data_exists</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check if file exists in data&quot;&quot;&quot;</span>
-    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
+    <span class="n">my_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;..</span><span class="se">\\</span><span class="s2">..</span><span class="se">\\</span><span class="s2">data</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">fileName</span> <span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">my_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">res</span>
     
@@ -11908,10 +11931,6 @@ As name suggest persistance alorithm is easy and simple, to predict value at tim
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">mean_squared_error</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span>
-
-<span class="c1"># date-time parsing function for loading the dataset</span>
-<span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-	<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s1">&#39;190&#39;</span><span class="o">+</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;%Y-%m&#39;</span><span class="p">)</span>
 
 <span class="c1"># convert time series into supervised learning problem</span>
 <span class="k">def</span> <span class="nf">series_to_supervised</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_in</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_out</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dropnan</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -12447,6 +12466,41 @@ height=277
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Results">Results<a class="anchor-link" href="#Results">&#182;</a></h3><p>From above results, it can be seen as we try to predict value in future model gives higher RMSE.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>For IBM</strong><br>
+Overall RMSE: 4.307973<br>
+<strong>For Microsoft</strong><br>
+Overall RMSE: 3.178238<br>
+<strong>For Apple</strong><br>
+Overall RMSE: 7.783148<br>
+<strong>For Amazon</strong><br>
+Overall RMSE: 109.06394</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Above results we have gotten in our baseline model shall be compared with our other models to decide on final model.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>PS: Above code and explanation is influenced by Jason Brownlee's awesome blog on time series forcasting<br>
+<a href="https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/">https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/</a></p>
 
 </div>
 </div>
