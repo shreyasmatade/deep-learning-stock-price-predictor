@@ -615,16 +615,28 @@ Amazon   : Overall RMSE: [40.295] 29.4, 34.1, 34.7, 38.3, 40.1, 48.3, 52.3
 Microsoft: Overall RMSE: [8.048] 6.6, 7.0, 7.2, 8.6, 8.7, 8.9, 8.9***   
  
 3. Univariate-Multistep-CNN-EncoderDecoder-LSTM  
-***IBM      : Overall RMSE: [3.886] 2.7, 3.2, 3.4, 3.8, 4.2, 4.6, 4.8  
-Apple    : Overall RMSE: [6.840] 6.5, 6.5, 7.5, 7.1, 6.3, 6.7, 7.2  
-Amazon   : Overall RMSE: [40.540] 31.3, 29.9, 33.5, 35.9, 46.0, 50.1, 50.9  
-Microsoft: Overall RMSE: [5.414] 3.1, 2.9, 5.8, 4.3, 6.4, 6.9, 6.8***
+***IBM      : Overall RMSE: [4.918] 3.4, 4.2, 4.5, 4.9, 5.3, 5.8, 5.8  
+Apple    : Overall RMSE: [4.564] 2.8, 3.4, 3.9, 5.7, 4.2, 5.2, 5.8  
+Amazon   : Overall RMSE: [38.541] 23.2, 26.7, 31.5, 34.2, 44.3, 49.4, 50.8  
+Microsoft: Overall RMSE: [3.085] 1.7, 2.0, 1.8, 3.2, 3.2, 5.0, 3.4***  
 
 ### Justification
 By looking at the results from different models and comparing it to our baseline model, we can see "Univariate-Multistep-CNN-EncoderDecoder-LSTM" is performing the best with minimum overall RMSE for all datasets in general. It also has less variance for each day RMSE.
+We observe that as we forecast more in the future our RMSE grows for all models, which is expected. 
+
+So,overall it is safe to say **"Univariate-Multistep-CNN-EncoderDecoder-LSTM"** is clear winner. 
 
 
 ## V. Conclusion
+
+### Free form visualization
+
+**Final Model Prediction vs Actual 
+
+![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/ibm-final-model.PNG "Final Model Prediction for IBM")
+![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/aapl-final-model.PNG "Final Model Prediction for Apple")   
+![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/msft-final-model.PNG "Final Model Prediction for Microsoft")
+![alt text](https://github.com/shreyasmatade/capstone/blob/master/res/amzn-final-model.PNG "Final Model Prediction for Amazon")
 
 
 **Interseting findings :**
