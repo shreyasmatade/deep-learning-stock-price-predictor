@@ -8,7 +8,7 @@ Deep Learning Stock Price Predictor
 
 ### Project intuition
 
-Like most of the tech engineers, I was impressed and surprised by the bitcoin-cryptocurrency boom. Like any other human, I was drawn to FOMO and started investing in crypto (and I can say proudly, i did not lost nor gained ). This is where I started my curiosity toward trading bots.  
+Being a tech engineer, I was impressed and surprised by the bitcoin-cryptocurrency boom. This is where I started my curiosity toward trading bots.  
 After taking Machine learning nanodegree course, I learned a lot about stats, data analysis and various machine learning models, methodologies.  
 I really wanted to apply my newly learned skills to work. However, cryptocurrency market is highly volatile and as of now it is becoming unreliable. Hence, just to get the taste of analyzing time series data I thought of exploring "comparatively" more reliable Stock Market.
 
